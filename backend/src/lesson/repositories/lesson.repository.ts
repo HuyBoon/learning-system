@@ -50,4 +50,15 @@ export class LessonRepository {
       ),
     );
   }
+
+  async updateManyOrders(orders: { id: string; order: number }[]): Promise<void> {
+    await this.prisma.$transaction(
+      orders.map((o) =>
+        this.prisma.lesson.update({
+          where: { id: o.id },
+          data: { order: o.order },
+        }),
+      ),
+    );
+  }
 }

@@ -45,7 +45,7 @@ export default function LoginPage() {
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+          <label className="block text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
             Email Address
           </label>
           <div className="relative group">
@@ -57,7 +57,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
-              className="w-full pl-12 pr-4 py-4 bg-slate-50/50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 focus:bg-white transition-all duration-300 font-medium placeholder:text-slate-300"
+              className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all duration-300 font-medium text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
               required
             />
           </div>
@@ -65,7 +65,7 @@ export default function LoginPage() {
 
         <div>
           <div className="flex items-center justify-between mb-2 px-1">
-            <label className="block text-[13px] font-bold text-slate-400 uppercase tracking-wider">
+            <label className="block text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               Password
             </label>
             <Link href="#" className="text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
@@ -81,7 +81,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full pl-12 pr-12 py-4 bg-slate-50/50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 focus:bg-white transition-all duration-300 font-medium placeholder:text-slate-300"
+              className="w-full pl-12 pr-12 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all duration-300 font-medium text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
               required
             />
             <button
@@ -115,11 +115,11 @@ export default function LoginPage() {
       </form>
 
       <div className="mt-10 text-center">
-        <p className="text-slate-500 font-medium">
+        <p className="text-slate-600 dark:text-slate-400 font-medium">
           New to LMSCore?{' '}
           <Link 
             href="/register" 
-            className="text-indigo-600 hover:text-indigo-700 font-bold transition-all relative group"
+            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-bold transition-all relative group"
           >
             <span>Create account</span>
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full" />

@@ -136,9 +136,9 @@ export const deleteLesson = createAsyncThunk(
 
 export const reorderLessons = createAsyncThunk(
   'courses/reorderLessons',
-  async ({ courseId, lessonIds }: { courseId: string; lessonIds: string[] }, { rejectWithValue }) => {
+  async ({ courseId, orders }: { courseId: string; orders: { id: string; order: number }[] }, { rejectWithValue }) => {
     try {
-      const response = await api.patch(`/lessons/reorder/${courseId}`, { lessonIds });
+      const response = await api.put(`/lessons/reorder/${courseId}`, { orders });
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to reorder lessons');

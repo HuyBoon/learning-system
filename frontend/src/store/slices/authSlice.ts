@@ -7,7 +7,10 @@ const initialState: AuthState = {
   token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
   isAuthenticated: false,
   loading: false,
+  usersLoading: false,
   error: null,
+  isInitialized: false,
+  users: [],
 };
 
 export const loginUser = createAsyncThunk(
@@ -47,6 +50,18 @@ export const fetchProfile = createAsyncThunk(
   }
 );
 
+export const fetchAllUsers = createAsyncThunk(
+  'auth/fetchAllUsers',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/auth/users');
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch users');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -61,6 +76,9 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    completeInitialization: (state) => {
+      state.isInitialized = true;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -74,6 +92,7 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.access_token;
         state.isAuthenticated = true;
+        state.isInitialized = true;
       })
       .addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
@@ -99,14 +118,29 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.isInitialized = true;
       })
       .addCase(fetchProfile.rejected, (state) => {
         state.loading = false;
         state.isAuthenticated = false;
         state.user = null;
+        state.isInitialized = true;
+        localStorage.removeItem('token');
+      })
+      // Fetch All Users (Admin)
+      .addCase(fetchAllUsers.pending, (state) => {
+        state.usersLoading = true;
+      })
+      .addCase(fetchAllUsers.fulfilled, (state, action: PayloadAction<User[]>) => {
+        state.usersLoading = false;
+        state.users = action.payload;
+      })
+      .addCase(fetchAllUsers.rejected, (state, action: PayloadAction<any>) => {
+        state.usersLoading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { logout, clearError, completeInitialization } = authSlice.actions;
 export default authSlice.reducer;

@@ -28,4 +28,15 @@ export class UserRepository {
   async delete(id: string): Promise<User> {
     return this.prisma.user.delete({ where: { id } });
   }
+
+  async findAll(): Promise<any[]> {
+    return this.prisma.user.findMany({
+      include: {
+        _count: {
+          select: { enrollments: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
 }

@@ -73,19 +73,19 @@ export default function Navbar() {
                     </Link>
                   )}
                   {(user?.role === 'INSTRUCTOR' || user?.role === 'ADMIN') && (
-                    <Link href="/admin/courses" className={`font-bold transition-all hover:text-blue-500 ${scrolled ? 'text-slate-300' : 'text-slate-600'}`}>
+                    <Link href="/admin" className={`font-bold transition-all hover:text-blue-500 ${scrolled ? 'text-slate-300' : 'text-slate-600'}`}>
                       Management
                     </Link>
                   )}
                   
                   <div className="flex items-center space-x-4 pl-4 border-l border-white/10">
-                    <div className="flex items-center space-x-2 px-4 py-2 glass rounded-full ring-1 ring-white/5">
+                    <Link href="/profile" className="flex items-center space-x-2 px-4 py-2 glass rounded-full ring-1 ring-white/5 hover:bg-white/10 transition-colors pointer-events-auto">
                       <UserIcon className="h-4 w-4 text-blue-400" />
                       <span className="text-sm font-bold text-white truncate max-w-[100px]">{user?.name}</span>
-                    </div>
+                    </Link>
                     <button
                       onClick={handleLogout}
-                      className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                      className="p-2 text-slate-400 hover:text-red-500 transition-colors pointer-events-auto"
                       title="Logout"
                     >
                       <LogOut className="h-5 w-5" />

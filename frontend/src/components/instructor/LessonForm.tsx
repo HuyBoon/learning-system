@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Lesson } from '@/types/course';
 import { X, Type, Video, FileText, Save } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import RichTextEditor from '../common/RichTextEditor';
 
 interface LessonFormProps {
   lesson?: Lesson | null;
@@ -107,17 +108,12 @@ export default function LessonForm({ lesson, onSave, onCancel, isOpen }: LessonF
                 </div>
 
                 <div>
-                  <label className="block text-sm font-black text-slate-900 uppercase tracking-wider mb-2">Content (Optional)</label>
-                  <div className="relative">
-                    <FileText className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-                    <textarea
-                      value={formData.content}
-                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                      rows={4}
-                      placeholder="Additional notes or instructions for this lesson..."
-                      className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-slate-900 font-medium outline-none resize-none"
-                    />
-                  </div>
+                  <label className="block text-sm font-black text-slate-900 uppercase tracking-wider mb-3 px-1">Lesson Content</label>
+                  <RichTextEditor 
+                    content={formData.content}
+                    onChange={(content) => setFormData({ ...formData, content })}
+                    placeholder="Provide detailed instructions, code snippets, or upload images directly into this lesson..."
+                  />
                 </div>
 
                 <div className="pt-4 flex items-center space-x-4">

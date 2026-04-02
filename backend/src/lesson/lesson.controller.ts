@@ -55,4 +55,15 @@ export class LessonController {
   ) {
     return this.lessonService.reorder(id, newOrder, req.user.userId, req.user.role);
   }
+
+  @Put('reorder/:courseId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.INSTRUCTOR, Role.ADMIN)
+  reorderBulk(
+    @Param('courseId') courseId: string,
+    @Body('orders') orders: { id: string; order: number }[],
+    @Request() req: any,
+  ) {
+    return this.lessonService.reorderBulk(courseId, orders, req.user.userId, req.user.role);
+  }
 }

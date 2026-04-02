@@ -89,4 +89,17 @@ export class LessonService {
 
     return this.lessonRepository.updateOrder(id, newOrder);
   }
+
+  async reorderBulk(courseId: string, orders: { id: string; order: number }[], userId: string, role: string) {
+    const course = await this.courseRepository.findById(courseId);
+    if (!course) {
+      throw new NotFoundException(`Course with ID ${courseId} not found`);
+    }
+
+    if (course.instructorId !== userId && role !== Role.ADMIN) {
+      throw new ForbiddenException('You are not allowed to reorder lessons in this course');
+    }
+
+    return this.lessonRepository.updateManyOrders(orders);
+  }
 }

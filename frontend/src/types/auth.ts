@@ -3,6 +3,10 @@ export interface User {
   email: string;
   name: string;
   role: 'ADMIN' | 'INSTRUCTOR' | 'STUDENT';
+  _count?: {
+    enrollments: number;
+    coursesCreated?: number;
+  };
 }
 
 export interface AuthState {
@@ -10,5 +14,8 @@ export interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
+  usersLoading: boolean;
   error: string | null;
+  isInitialized: boolean;
+  users: User[];
 }

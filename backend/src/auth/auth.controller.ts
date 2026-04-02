@@ -2,6 +2,9 @@ import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common'
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RolesGuard } from './guards/roles.guard';
+import { Roles } from './decorators/roles.decorator';
+import { Role } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -21,5 +24,12 @@ export class AuthController {
   @Get('profile')
   getProfile(@Request() req: any) {
     return this.authService.getProfile(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Get('users')
+  findAllUsers() {
+    return this.authService.findAllUsers();
   }
 }

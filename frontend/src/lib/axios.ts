@@ -23,4 +23,22 @@ api.interceptors.request.use(
   }
 );
 
+// Response interceptor for handling 401 errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+           setTimeout(() => {
+             window.location.href = '/login?expired=true';
+           }, 100);
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

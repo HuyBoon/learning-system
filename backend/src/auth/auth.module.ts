@@ -7,13 +7,21 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserRepository } from './repositories/user.repository';
 import { PrismaModule } from '../prisma/prisma.module';
 
+import { ConfigService, ConfigModule } from '@nestjs/config';
+
 @Module({
   imports: [
     PrismaModule,
     PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'supersecret',
-      signOptions: { expiresIn: '1d' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET') || 'supersecret',
+        signOptions: { 
+          expiresIn: (configService.get<string>('JWT_EXPIRES_IN') || '1d') as any
+        },
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],

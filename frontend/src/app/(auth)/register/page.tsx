@@ -48,7 +48,7 @@ export default function RegisterPage() {
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+          <label className="block text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
             Full Name
           </label>
           <div className="relative group">
@@ -60,14 +60,14 @@ export default function RegisterPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="John Doe"
-              className="w-full pl-12 pr-4 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 focus:bg-white transition-all duration-300 font-medium placeholder:text-slate-300"
+              className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all duration-300 font-medium text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
               required
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+          <label className="block text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
             Email Address
           </label>
           <div className="relative group">
@@ -79,14 +79,14 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
-              className="w-full pl-12 pr-4 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 focus:bg-white transition-all duration-300 font-medium placeholder:text-slate-300"
+              className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all duration-300 font-medium text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
               required
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+          <label className="block text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
             Password
           </label>
           <div className="relative group">
@@ -98,7 +98,7 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full pl-12 pr-12 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 focus:bg-white transition-all duration-300 font-medium placeholder:text-slate-300"
+              className="w-full pl-12 pr-12 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all duration-300 font-medium text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
               required
             />
             <button
@@ -112,7 +112,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="pb-2">
-          <label className="block text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+          <label className="block text-[13px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
             Account Type
           </label>
           <div className="grid grid-cols-2 gap-3">
@@ -121,11 +121,11 @@ export default function RegisterPage() {
               onClick={() => setRole('STUDENT')}
               className={`p-4 rounded-2xl font-bold flex flex-col items-center justify-center space-y-2 transition-all duration-300 border-2 ${
                 role === 'STUDENT' 
-                  ? 'bg-indigo-50/50 border-indigo-600 text-indigo-700 shadow-sm' 
-                  : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200 hover:bg-slate-50/50'
+                  ? 'bg-indigo-50/50 dark:bg-indigo-500/10 border-indigo-600 text-indigo-700 dark:text-indigo-400 shadow-sm' 
+                  : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-slate-200 dark:hover:border-slate-700 hover:bg-slate-50/50 dark:hover:bg-slate-800/50'
               }`}
             >
-              <GraduationCap className={`h-6 w-6 ${role === 'STUDENT' ? 'text-indigo-600 animate-bounce' : 'text-slate-300'}`} />
+              <GraduationCap className={`h-6 w-6 ${role === 'STUDENT' ? 'text-indigo-600 animate-bounce' : 'text-slate-400 dark:text-slate-500'}`} />
               <span className="text-sm">Student</span>
             </button>
             <button
@@ -133,11 +133,11 @@ export default function RegisterPage() {
               onClick={() => setRole('INSTRUCTOR')}
               className={`p-4 rounded-2xl font-bold flex flex-col items-center justify-center space-y-2 transition-all duration-300 border-2 ${
                 role === 'INSTRUCTOR' 
-                  ? 'bg-indigo-50/50 border-indigo-600 text-indigo-700 shadow-sm' 
-                  : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200 hover:bg-slate-50/50'
+                  ? 'bg-indigo-50/50 dark:bg-indigo-500/10 border-indigo-600 text-indigo-700 dark:text-indigo-400 shadow-sm' 
+                  : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-slate-200 dark:hover:border-slate-700 hover:bg-slate-50/50 dark:hover:bg-slate-800/50'
               }`}
             >
-              <Laptop className={`h-6 w-6 ${role === 'INSTRUCTOR' ? 'text-indigo-600 animate-pulse' : 'text-slate-300'}`} />
+              <Laptop className={`h-6 w-6 ${role === 'INSTRUCTOR' ? 'text-indigo-600 animate-pulse' : 'text-slate-400 dark:text-slate-500'}`} />
               <span className="text-sm">Instructor</span>
             </button>
           </div>
@@ -163,9 +163,9 @@ export default function RegisterPage() {
         </div>
       </form>
 
-      <div className="mt-8 text-center text-slate-500 font-medium">
+      <div className="mt-8 text-center text-slate-600 dark:text-slate-400 font-medium">
         Already have an account?{' '}
-        <Link href="/login" className="text-indigo-600 hover:text-indigo-700 font-bold transition-all relative group">
+        <Link href="/login" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-bold transition-all relative group">
           <span>Sign In</span>
           <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full" />
         </Link>

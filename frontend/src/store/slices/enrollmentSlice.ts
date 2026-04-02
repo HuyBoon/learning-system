@@ -11,6 +11,7 @@ interface Enrollment {
 
 interface EnrollmentState {
   myEnrollments: Enrollment[];
+  allEnrollments: Enrollment[];
   enrollmentStatus: Record<string, { enrolled: boolean; status: string | null }>;
   loading: boolean;
   error: string | null;
@@ -18,6 +19,7 @@ interface EnrollmentState {
 
 const initialState: EnrollmentState = {
   myEnrollments: [],
+  allEnrollments: [],
   enrollmentStatus: {},
   loading: false,
   error: null,
@@ -59,6 +61,18 @@ export const checkEnrollmentStatus = createAsyncThunk(
   }
 );
 
+export const fetchAllEnrollments = createAsyncThunk(
+  'enrollment/fetchAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/enrollments/all');
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch enrollments');
+    }
+  }
+);
+
 const enrollmentSlice = createSlice({
   name: 'enrollment',
   initialState,
@@ -92,6 +106,18 @@ const enrollmentSlice = createSlice({
            enrolled: action.payload.enrolled,
            status: action.payload.status
          };
+      })
+      // Fetch All (Admin)
+      .addCase(fetchAllEnrollments.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchAllEnrollments.fulfilled, (state, action: PayloadAction<Enrollment[]>) => {
+        state.loading = false;
+        state.allEnrollments = action.payload;
+      })
+      .addCase(fetchAllEnrollments.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

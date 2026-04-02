@@ -42,4 +42,11 @@ export class EnrollmentController {
   checkEnrollment(@Param('courseId') courseId: string, @Request() req: any) {
     return this.enrollmentService.checkEnrollment(req.user.userId, courseId);
   }
+
+  @Get('all')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  findAll() {
+    return this.enrollmentService.findAll();
+  }
 }

@@ -58,12 +58,20 @@ export class AuthService {
 
   async getProfile(userId: string) {
     const user = await this.userRepository.findById(userId);
-
+ 
     if (!user) {
         throw new UnauthorizedException('User not found');
     }
 
     const { password: _, ...result } = user;
     return result;
+  }
+
+  async findAllUsers() {
+    const users = await this.userRepository.findAll();
+    return users.map(user => {
+      const { password, ...result } = user;
+      return result;
+    });
   }
 }

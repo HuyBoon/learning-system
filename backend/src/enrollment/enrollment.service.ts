@@ -49,4 +49,23 @@ export class EnrollmentService {
     const enrollment = await this.enrollmentRepository.findUnique(userId, courseId);
     return !!enrollment;
   }
+
+  async findAll() {
+    return this.enrollmentRepository.findMany({}, {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        }
+      },
+      course: {
+        select: {
+          id: true,
+          title: true,
+          thumbnail: true,
+        }
+      }
+    });
+  }
 }
