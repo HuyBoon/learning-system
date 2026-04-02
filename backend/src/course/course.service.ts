@@ -1,73 +1,87 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { CourseRepository } from './repositories/course.repository';
 import { CreateCourseDto, UpdateCourseDto } from './dto/course.dto';
 import { Role } from '../auth/dto/auth.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CourseService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private courseRepository: CourseRepository) {}
 
   async create(createCourseDto: CreateCourseDto, instructorId: string) {
-    if (createCourseDto.categoryId) {
-        const category = await this.prisma.category.findUnique({
-            where: { id: createCourseDto.categoryId }
-        });
-        if (!category) {
-            throw new BadRequestException('Invalid category ID');
-        }
-    }
-
-    return this.prisma.course.create({
-      data: {
-        ...createCourseDto,
-        instructorId,
-      },
+    return this.courseRepository.create({
+      ...createCourseDto,
+      instructor: { connect: { id: instructorId } },
+      category: createCourseDto.categoryId ? { connect: { id: createCourseDto.categoryId } } : undefined,
     });
   }
 
-  async findAll(categoryId?: string, search?: string) {
-    const where: any = {};
+  async findAll(params: {
+    page?: number;
+    limit?: number;
+    categoryId?: string;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }) {
+    const { page = 1, limit = 10, categoryId, search, sortBy = 'createdAt', sortOrder = 'desc' } = params;
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.CourseWhereInput = {};
     
     if (categoryId) {
       where.categoryId = categoryId;
     }
     
     if (search) {
-      where.title = {
-        contains: search,
-      };
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+      ];
     }
 
-    return this.prisma.course.findMany({
-      where,
-      include: {
-        instructor: {
-          select: { id: true, name: true, email: true }
+    const [courses, total] = await Promise.all([
+      this.courseRepository.findMany({
+        skip,
+        take: limit,
+        where,
+        orderBy: { [sortBy]: sortOrder },
+        include: {
+          instructor: {
+            select: { id: true, name: true, email: true }
+          },
+          category: true,
+          _count: {
+            select: { lessons: true, enrollments: true }
+          }
         },
-        category: true,
-        _count: {
-          select: { lessons: true, enrollments: true }
-        }
+      }),
+      this.courseRepository.count(where),
+    ]);
+
+    return {
+      data: courses,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-      orderBy: { createdAt: 'desc' },
-    });
+    };
   }
 
   async findOne(id: string) {
-    const course = await this.prisma.course.findUnique({
-      where: { id },
-      include: {
-        instructor: {
-          select: { id: true, name: true, email: true }
-        },
-        category: true,
-        lessons: {
-          orderBy: { order: 'asc' }
-        },
-        _count: {
-            select: { enrollments: true }
-        }
+    const course = await this.courseRepository.findById(id, {
+      instructor: {
+        select: { id: true, name: true, email: true }
       },
+      category: true,
+      lessons: {
+        orderBy: { order: 'asc' }
+      },
+      _count: {
+        select: { enrollments: true }
+      }
     });
 
     if (!course) {
@@ -80,41 +94,25 @@ export class CourseService {
   async update(id: string, updateCourseDto: UpdateCourseDto, userId: string, role: string) {
     const course = await this.findOne(id);
 
-    // Only the instructor of the course or an admin can update it
     if (course.instructorId !== userId && role !== Role.ADMIN) {
       throw new ForbiddenException('You are not allowed to update this course');
     }
 
-    if (updateCourseDto.categoryId) {
-        const category = await this.prisma.category.findUnique({
-            where: { id: updateCourseDto.categoryId }
-        });
-        if (!category) {
-            throw new BadRequestException('Invalid category ID');
-        }
-    }
-
-    return this.prisma.course.update({
-      where: { id },
-      data: updateCourseDto,
-    });
+    return this.courseRepository.update(id, updateCourseDto);
   }
 
   async remove(id: string, userId: string, role: string) {
     const course = await this.findOne(id);
 
-    // Only the instructor of the course or an admin can delete it
     if (course.instructorId !== userId && role !== Role.ADMIN) {
       throw new ForbiddenException('You are not allowed to delete this course');
     }
 
-    return this.prisma.course.delete({
-      where: { id },
-    });
+    return this.courseRepository.delete(id);
   }
 
   async findInstructorCourses(instructorId: string) {
-    return this.prisma.course.findMany({
+    return this.courseRepository.findMany({
       where: { instructorId },
       include: {
         category: true,

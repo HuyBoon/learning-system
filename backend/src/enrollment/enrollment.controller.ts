@@ -1,6 +1,10 @@
-import { Controller, Post, Get, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, UseGuards, Request, Patch } from '@nestjs/common';
 import { EnrollmentService } from './enrollment.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/dto/auth.dto';
+import { EnrollmentStatus } from '@prisma/client';
 
 @Controller('enrollments')
 @UseGuards(JwtAuthGuard)
@@ -12,13 +16,30 @@ export class EnrollmentController {
     return this.enrollmentService.enroll(req.user.userId, courseId);
   }
 
-  @Get('my')
-  getMyEnrollments(@Request() req: any) {
-    return this.enrollmentService.getMyEnrollments(req.user.userId);
+  @Get('my-enrollments')
+  findByUser(@Request() req: any) {
+    return this.enrollmentService.findByUser(req.user.userId);
+  }
+
+  @Get('course/:courseId')
+  @UseGuards(RolesGuard)
+  @Roles(Role.INSTRUCTOR, Role.ADMIN)
+  findByCourse(@Param('courseId') courseId: string) {
+    return this.enrollmentService.findByCourse(courseId);
+  }
+
+  @Patch(':id/status')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  updateStatus(
+    @Param('id') id: string,
+    @Body('status') status: EnrollmentStatus,
+  ) {
+    return this.enrollmentService.updateStatus(id, status);
   }
 
   @Get('check/:courseId')
-  checkStatus(@Param('courseId') courseId: string, @Request() req: any) {
-    return this.enrollmentService.checkStatus(req.user.userId, courseId);
+  checkEnrollment(@Param('courseId') courseId: string, @Request() req: any) {
+    return this.enrollmentService.checkEnrollment(req.user.userId, courseId);
   }
 }

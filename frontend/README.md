@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📱 LMSCore Frontend: Premium Education Platform
 
-## Getting Started
+[![Next.js 15](https://img.shields.io/badge/Next.js%2015-black?logo=next.js)](https://nextjs.org/)
+[![Tailwind 4](https://img.shields.io/badge/Tailwind%204-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
+[![Redux Toolkit](https://img.shields.io/badge/Redux-Toolkit-764ABC?logo=redux)](https://redux-toolkit.js.org/)
 
-First, run the development server:
+The **LMSCore Frontend** is a modern, high-performance web application designed for a premium user experience. Built with Next.js 15, it leverages server-side rendering, type-safety, and fluid animations to provide a top-tier educational interface.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 🎨 Design Philosophy
+
+- **Premium Aesthetics**: Clean, modern design with a focused color palette (Indigo, Slate).
+- **Glassmorphism**: Subtle backdrops and blurs for a "layered" feel.
+- **Micro-interactions**: Framer Motion powered transitions for buttons, forms, and page changes.
+- **Accessibility**: Semantic HTML and keyboard-friendly navigation.
+
+---
+
+## 🛠️ Technology Stack
+
+| Feature | Technology |
+| :--- | :--- |
+| **Framework** | Next.js 15 (App Router) |
+| **Styling** | Tailwind CSS 4 |
+| **Animations** | Framer Motion |
+| **State Management** | Redux Toolkit |
+| **Forms/Validation** | Native React Hooks |
+| **Icons** | Lucide React |
+| **HTTP Client** | Axios |
+| **Notifications** | React Hot Toast |
+
+---
+
+## 📁 Project Structure
+
+```text
+src/
+├── app/               # Next.js App Router (pages and layouts)
+│   ├── (auth)/        # Authentication routes (Login, Register)
+│   └── (dashboard)/   # Student/Instructor dashboard (TBD)
+├── components/        # Reusable UI components
+│   ├── auth/          # Authentication specific components
+│   ├── layout/        # Global layout elements (Nav, Footer)
+│   ├── ui/            # Base UI primitives (Buttons, Inputs)
+│   └── providers/     # React Context/Provider wrappers
+├── store/             # Redux state management (slices, hooks)
+├── lib/               # Utility functions, API config, helpers
+├── types/             # TypeScript interfaces and types
+└── public/            # Static assets (images, icons)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Getting Started
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Installation
+```bash
+npm install
+```
 
-## Learn More
+### 2. Environment Setup
+Create a `.env.local` file:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5001
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Start Development
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🏗️ Core Features
 
-## Deploy on Vercel
+- **Split-screen Auth**: Visually immersive Login/Register experience.
+- **Role-based Views**: Tailored dashboards for Students and Instructors.
+- **Dynamic Content**: Instant UI updates via Redux.
+- **Optimized Assets**: Next.js 15 Image optimization for speed.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🤝 Contributing
+
+Contributions are welcome! Please check our root `CONTRIBUTING.md`.

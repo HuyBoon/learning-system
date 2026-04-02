@@ -1,70 +1,38 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { CategoryRepository } from './repositories/category.repository';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
 
 @Injectable()
 export class CategoryService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private categoryRepository: CategoryRepository) {}
 
-  async create(dto: CreateCategoryDto) {
-    const existing = await this.prisma.category.findUnique({
-      where: { name: dto.name },
-    });
-
+  async create(createCategoryDto: CreateCategoryDto) {
+    const existing = await this.categoryRepository.findByName(createCategoryDto.name);
     if (existing) {
-      throw new ConflictException('Category with this name already exists');
+      throw new ConflictException(`Category with name ${createCategoryDto.name} already exists`);
     }
-
-    return this.prisma.category.create({
-      data: dto,
-    });
+    return this.categoryRepository.create(createCategoryDto);
   }
 
   async findAll() {
-    return this.prisma.category.findMany({
-      orderBy: { name: 'asc' },
-    });
+    return this.categoryRepository.findAll();
   }
 
   async findOne(id: string) {
-    const category = await this.prisma.category.findUnique({
-      where: { id },
-      include: {
-        _count: {
-          select: { courses: true },
-        },
-      },
-    });
-
+    const category = await this.categoryRepository.findById(id);
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
-
     return category;
   }
 
-  async update(id: string, dto: UpdateCategoryDto) {
-    const category = await this.findOne(id);
-
-    if (dto.name && dto.name !== category.name) {
-      const existing = await this.prisma.category.findUnique({
-        where: { name: dto.name },
-      });
-      if (existing) {
-        throw new ConflictException('Category with this name already exists');
-      }
-    }
-
-    return this.prisma.category.update({
-      where: { id },
-      data: dto,
-    });
+  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+    await this.findOne(id);
+    return this.categoryRepository.update(id, updateCategoryDto);
   }
 
   async remove(id: string) {
     await this.findOne(id);
-    return this.prisma.category.delete({
-      where: { id },
-    });
+    return this.categoryRepository.delete(id);
   }
 }

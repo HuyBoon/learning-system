@@ -1,78 +1,52 @@
-import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { EnrollmentRepository } from './repositories/enrollment.repository';
+import { CourseRepository } from '../course/repositories/course.repository';
+import { EnrollmentStatus } from '@prisma/client';
 
 @Injectable()
 export class EnrollmentService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private enrollmentRepository: EnrollmentRepository,
+    private courseRepository: CourseRepository,
+  ) {}
 
   async enroll(userId: string, courseId: string) {
-    // Check if course exists
-    const course = await this.prisma.course.findUnique({
-      where: { id: courseId },
-    });
-
+    const course = await this.courseRepository.findById(courseId);
     if (!course) {
       throw new NotFoundException(`Course with ID ${courseId} not found`);
     }
 
-    // Check if already enrolled
-    const existingEnrollment = await this.prisma.enrollment.findUnique({
-      where: {
-        userId_courseId: {
-          userId,
-          courseId,
-        },
-      },
-    });
-
+    const existingEnrollment = await this.enrollmentRepository.findUnique(userId, courseId);
     if (existingEnrollment) {
-      throw new ConflictException('You are already enrolled in this course');
+      throw new ConflictException('Already enrolled in this course');
     }
 
-    return this.prisma.enrollment.create({
-      data: {
-        userId,
-        courseId,
-      },
-      include: {
-        course: true,
-      },
+    return this.enrollmentRepository.create({
+      userId,
+      courseId,
+      status: EnrollmentStatus.PENDING,
     });
   }
 
-  async getMyEnrollments(userId: string) {
-    return this.prisma.enrollment.findMany({
-      where: { userId },
-      include: {
-        course: {
-          include: {
-            instructor: {
-              select: { name: true, id: true },
-            },
-            category: true,
-            _count: {
-              select: { lessons: true },
-            },
-          },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+  async findByUser(userId: string) {
+    return this.enrollmentRepository.findByUserId(userId);
   }
 
-  async checkStatus(userId: string, courseId: string) {
-    const enrollment = await this.prisma.enrollment.findUnique({
-      where: {
-        userId_courseId: {
-          userId,
-          courseId,
-        },
-      },
-    });
+  async findByCourse(courseId: string) {
+    return this.enrollmentRepository.findByCourseId(courseId);
+  }
 
-    return {
-      enrolled: !!enrollment,
-      status: enrollment?.status || null,
-    };
+  async updateStatus(id: string, status: EnrollmentStatus) {
+    const enrollment = await this.enrollmentRepository.findById(id);
+    if (!enrollment) {
+      throw new NotFoundException(`Enrollment with ID ${id} not found`);
+    }
+
+    return this.enrollmentRepository.updateStatus(id, status);
+  }
+
+  async checkEnrollment(userId: string, courseId: string) {
+    const enrollment = await this.enrollmentRepository.findUnique(userId, courseId);
+    return !!enrollment;
   }
 }

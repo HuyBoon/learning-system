@@ -72,6 +72,18 @@ export const updateCourse = createAsyncThunk(
   }
 );
 
+export const deleteCourse = createAsyncThunk(
+  'courses/delete',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await api.delete(`/courses/${id}`);
+      return id;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to delete course');
+    }
+  }
+);
+
 // Category Thunks
 export const fetchCategories = createAsyncThunk(
   'courses/fetchCategories',
@@ -151,9 +163,9 @@ const courseSlice = createSlice({
       .addCase(fetchCourses.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchCourses.fulfilled, (state, action: PayloadAction<Course[]>) => {
+      .addCase(fetchCourses.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.courses = action.payload;
+        state.courses = action.payload.data || action.payload;
       })
       .addCase(fetchCourses.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
@@ -174,6 +186,11 @@ const courseSlice = createSlice({
       // Create Course
       .addCase(createCourse.fulfilled, (state, action: PayloadAction<Course>) => {
         state.instructorCourses.unshift(action.payload);
+      })
+      // Delete Course
+      .addCase(deleteCourse.fulfilled, (state, action: PayloadAction<string>) => {
+        state.courses = state.courses.filter(c => c.id !== action.payload);
+        state.instructorCourses = state.instructorCourses.filter(c => c.id !== action.payload);
       })
       // Categories
       .addCase(fetchCategories.fulfilled, (state, action: PayloadAction<Category[]>) => {

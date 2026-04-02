@@ -232,11 +232,21 @@ function CourseDetailContent() {
 
                  <button 
                    onClick={handleEnrollOrGo}
-                   className="w-full flex items-center justify-center space-x-2 py-5 bg-indigo-600 text-white rounded-[1.5rem] font-bold text-lg hover:bg-slate-900 transition-all shadow-xl shadow-indigo-100 active:scale-[0.98] mb-6"
+                   className="w-full flex items-center justify-center space-x-2 py-5 bg-indigo-600 text-white rounded-[1.5rem] font-bold text-lg hover:bg-slate-900 transition-all shadow-xl shadow-indigo-100 active:scale-[0.98] mb-4"
                  >
                    <span>{currentEnrollment?.enrolled ? 'Go to Learning' : 'Enroll Now'}</span>
                    <ArrowRight className="h-5 w-5" />
                  </button>
+
+                 {(user?.role === 'ADMIN' || user?.id === selectedCourse.instructorId) && (
+                   <button 
+                     onClick={() => router.push(`/admin/courses/edit?id=${id}`)}
+                     className="w-full flex items-center justify-center space-x-2 py-3 bg-slate-100 text-slate-700 rounded-[1.5rem] font-bold hover:bg-slate-200 transition-all mb-6 border border-slate-200"
+                   >
+                     <ExternalLink className="h-4 w-4" />
+                     <span>Edit Course Content</span>
+                   </button>
+                 )}
 
                  <div className="space-y-4 mb-2">
                     {[

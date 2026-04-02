@@ -13,11 +13,14 @@ const geistMono = Geist_Mono({
 });
 
 import StoreProvider from "@/components/providers/StoreProvider";
+import AppInitializer from "@/components/AppInitializer";
 import { Toaster } from "react-hot-toast";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "LMS Platform | Learn Anywhere",
-  description: "A premium Full-stack Education Platform built with NestJS and Next.js",
+  title: "HuyBoon Academy | Master the Future",
+  description: "A premium Full-stack Education Platform built by HuyBoon",
 };
 
 export default function RootLayout({
@@ -28,12 +31,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
+      <body className="min-h-full flex flex-col bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100">
         <StoreProvider>
-          {children}
-          <Toaster position="top-right" />
+          <AppInitializer>
+            <Navbar />
+            <main className="flex-1 pt-32 pb-20">
+              {children}
+            </main>
+            <Footer />
+            <Toaster position="top-right" />
+          </AppInitializer>
         </StoreProvider>
       </body>
     </html>

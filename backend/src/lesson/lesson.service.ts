@@ -1,101 +1,92 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { LessonRepository } from './repositories/lesson.repository';
+import { CourseRepository } from '../course/repositories/course.repository';
 import { CreateLessonDto, UpdateLessonDto } from './dto/lesson.dto';
 import { Role } from '../auth/dto/auth.dto';
 
 @Injectable()
 export class LessonService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private lessonRepository: LessonRepository,
+    private courseRepository: CourseRepository,
+  ) {}
 
-  private async verifyCourseOwnership(courseId: string, userId: string, role: string) {
-    const course = await this.prisma.course.findUnique({
-      where: { id: courseId },
-    });
-
+  async create(createLessonDto: CreateLessonDto, userId: string, role: string) {
+    const course = await this.courseRepository.findById(createLessonDto.courseId);
     if (!course) {
-      throw new NotFoundException(`Course with ID ${courseId} not found`);
+      throw new NotFoundException(`Course with ID ${createLessonDto.courseId} not found`);
     }
 
     if (course.instructorId !== userId && role !== Role.ADMIN) {
-      throw new ForbiddenException('You do not have permission to manage lessons for this course');
+      throw new ForbiddenException('You are not allowed to add lessons to this course');
     }
 
-    return course;
-  }
+    // Get the current max order
+    const lessons = await this.lessonRepository.findByCourseId(createLessonDto.courseId);
+    const order = lessons.length > 0 ? Math.max(...lessons.map(l => l.order)) + 1 : 0;
 
-  async create(createLessonDto: CreateLessonDto, userId: string, role: string) {
-    await this.verifyCourseOwnership(createLessonDto.courseId, userId, role);
-
-    // Get the current max order if not provided
-    if (createLessonDto.order === undefined) {
-      const maxOrderLesson = await this.prisma.lesson.findFirst({
-        where: { courseId: createLessonDto.courseId },
-        orderBy: { order: 'desc' },
-      });
-      createLessonDto.order = maxOrderLesson ? maxOrderLesson.order + 1 : 0;
-    }
-
-    return this.prisma.lesson.create({
-      data: createLessonDto,
+    return this.lessonRepository.create({
+      ...createLessonDto,
+      order,
     });
   }
 
   async findByCourse(courseId: string) {
-    const course = await this.prisma.course.findUnique({
-        where: { id: courseId }
-    });
-    if (!course) {
-        throw new NotFoundException(`Course with ID ${courseId} not found`);
-    }
-
-    return this.prisma.lesson.findMany({
-      where: { courseId },
-      orderBy: { order: 'asc' },
-    });
+    return this.lessonRepository.findByCourseId(courseId);
   }
 
   async findOne(id: string) {
-    const lesson = await this.prisma.lesson.findUnique({
-      where: { id },
-      include: { course: true },
-    });
-
+    const lesson = await this.lessonRepository.findById(id);
     if (!lesson) {
       throw new NotFoundException(`Lesson with ID ${id} not found`);
     }
-
     return lesson;
   }
 
   async update(id: string, updateLessonDto: UpdateLessonDto, userId: string, role: string) {
     const lesson = await this.findOne(id);
-    await this.verifyCourseOwnership(lesson.courseId, userId, role);
+    const course = await this.courseRepository.findById(lesson.courseId);
+    if (!course) {
+      throw new NotFoundException(`Course with ID ${lesson.courseId} not found`);
+    }
 
-    return this.prisma.lesson.update({
-      where: { id },
-      data: updateLessonDto,
-    });
+    if (course.instructorId !== userId && role !== Role.ADMIN) {
+      throw new ForbiddenException('You are not allowed to update this lesson');
+    }
+
+    return this.lessonRepository.update(id, updateLessonDto);
   }
 
   async remove(id: string, userId: string, role: string) {
     const lesson = await this.findOne(id);
-    await this.verifyCourseOwnership(lesson.courseId, userId, role);
+    const course = await this.courseRepository.findById(lesson.courseId);
+    if (!course) {
+      throw new NotFoundException(`Course with ID ${lesson.courseId} not found`);
+    }
 
-    return this.prisma.lesson.delete({
-      where: { id },
-    });
+    if (course.instructorId !== userId && role !== Role.ADMIN) {
+      throw new ForbiddenException('You are not allowed to delete this lesson');
+    }
+
+    await this.lessonRepository.delete(id);
+    
+    // Reorder remaining lessons
+    await this.lessonRepository.reorderLessons(lesson.courseId);
+    
+    return { message: 'Lesson deleted successfully' };
   }
 
-  async reorder(courseId: string, lessonIds: string[], userId: string, role: string) {
-    await this.verifyCourseOwnership(courseId, userId, role);
+  async reorder(id: string, newOrder: number, userId: string, role: string) {
+    const lesson = await this.findOne(id);
+    const course = await this.courseRepository.findById(lesson.courseId);
+    if (!course) {
+      throw new NotFoundException(`Course with ID ${lesson.courseId} not found`);
+    }
 
-    const transaction = lessonIds.map((id, index) =>
-      this.prisma.lesson.update({
-        where: { id },
-        data: { order: index },
-      }),
-    );
+    if (course.instructorId !== userId && role !== Role.ADMIN) {
+      throw new ForbiddenException('You are not allowed to reorder lessons in this course');
+    }
 
-    return this.prisma.$transaction(transaction);
+    return this.lessonRepository.updateOrder(id, newOrder);
   }
 }
