@@ -57,4 +57,32 @@ export class EnrollmentRepository {
   async delete(id: string): Promise<Enrollment> {
     return this.prisma.enrollment.delete({ where: { id } });
   }
+
+  async findEnrolledEnrollments(instructorId: string): Promise<any[]> {
+    return this.prisma.enrollment.findMany({
+      where: {
+        course: {
+          instructorId: instructorId
+        }
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          }
+        },
+        course: {
+          select: {
+            id: true,
+            title: true,
+            thumbnail: true,
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
 }
+

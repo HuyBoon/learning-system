@@ -11,7 +11,9 @@ const initialState: AuthState = {
   error: null,
   isInitialized: false,
   users: [],
+  isUsersFetched: false,
 };
+
 
 export const loginUser = createAsyncThunk(
   'auth/login',
@@ -61,6 +63,19 @@ export const fetchAllUsers = createAsyncThunk(
     }
   }
 );
+
+export const fetchEnrolledStudents = createAsyncThunk(
+  'auth/fetchEnrolledStudents',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/auth/enrolled-students');
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch enrolled students');
+    }
+  }
+);
+
 
 const authSlice = createSlice({
   name: 'auth',
@@ -130,15 +145,35 @@ const authSlice = createSlice({
       // Fetch All Users (Admin)
       .addCase(fetchAllUsers.pending, (state) => {
         state.usersLoading = true;
+        state.error = null;
       })
       .addCase(fetchAllUsers.fulfilled, (state, action: PayloadAction<User[]>) => {
         state.usersLoading = false;
         state.users = action.payload;
+        state.isUsersFetched = true;
       })
       .addCase(fetchAllUsers.rejected, (state, action: PayloadAction<any>) => {
         state.usersLoading = false;
         state.error = action.payload;
+        state.isUsersFetched = true;
+      })
+      // Fetch Enrolled Students (Instructor)
+      .addCase(fetchEnrolledStudents.pending, (state) => {
+        state.usersLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchEnrolledStudents.fulfilled, (state, action: PayloadAction<User[]>) => {
+        state.usersLoading = false;
+        state.users = action.payload;
+        state.isUsersFetched = true;
+      })
+      .addCase(fetchEnrolledStudents.rejected, (state, action: PayloadAction<any>) => {
+        state.usersLoading = false;
+        state.error = action.payload;
+        state.isUsersFetched = true;
       });
+
+
   },
 });
 

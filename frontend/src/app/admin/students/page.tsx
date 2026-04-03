@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchAllUsers } from '@/store/slices/authSlice';
+import { fetchAllUsers, fetchEnrolledStudents } from '@/store/slices/authSlice';
+
 import { 
   Users, Search, Shield, User as UserIcon, 
   CheckCircle2, XCircle, Mail, MoreHorizontal 
@@ -12,16 +13,25 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function AdminStudentsPage() {
   const dispatch = useAppDispatch();
   // Lấy thêm error để hiển thị nếu API tèo
-  const { users, loading, usersLoading, error } = useAppSelector((state) => state.auth);
+  const { user, users, usersLoading, error, isUsersFetched } = useAppSelector((state) => state.auth);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
 
   useEffect(() => {
-    const hasUsers = Array.isArray(users) && users.length > 0;
-    if (!loading && !hasUsers && !usersLoading) {
-      dispatch(fetchAllUsers());
+    // Only fetch if not already loading and we haven't successfully fetched yet
+    if (usersLoading || isUsersFetched) {
+      return;
     }
-  }, [dispatch, loading, users, usersLoading]);
+
+    if (user?.role === 'ADMIN') {
+      dispatch(fetchAllUsers());
+    } else if (user?.role === 'INSTRUCTOR') {
+      dispatch(fetchEnrolledStudents());
+    }
+  }, [dispatch, user?.role, isUsersFetched, usersLoading]);
+
+
 
   // Dùng useMemo để tối ưu hiệu năng và tránh crash nếu users undefined
   const filteredUsers = useMemo(() => {

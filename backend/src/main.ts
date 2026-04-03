@@ -12,7 +12,6 @@ async function bootstrap() {
   }));
   app.enableCors();
   
-  const jwtSecret = process.env.JWT_SECRET || 'supersecret';
   
   await app.listen(process.env.PORT ?? 3000);
 }

@@ -18,4 +18,6 @@ export interface AuthState {
   error: string | null;
   isInitialized: boolean;
   users: User[];
+  isUsersFetched: boolean;
 }
+

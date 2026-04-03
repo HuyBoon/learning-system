@@ -49,4 +49,12 @@ export class EnrollmentController {
   findAll() {
     return this.enrollmentService.findAll();
   }
+
+  @Get('enrolled-students')
+  @UseGuards(RolesGuard)
+  @Roles(Role.INSTRUCTOR)
+  findEnrolledStudents(@Request() req: any) {
+    return this.enrollmentService.findEnrolledEnrollments(req.user.userId);
+  }
 }
+

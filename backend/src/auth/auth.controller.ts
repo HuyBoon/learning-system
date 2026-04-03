@@ -32,4 +32,12 @@ export class AuthController {
   findAllUsers() {
     return this.authService.findAllUsers();
   }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.INSTRUCTOR)
+  @Get('enrolled-students')
+  findEnrolledStudents(@Request() req: any) {
+    return this.authService.findEnrolledStudents(req.user.userId);
+  }
 }
+

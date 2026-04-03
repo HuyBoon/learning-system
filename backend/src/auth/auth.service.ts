@@ -67,6 +67,14 @@ export class AuthService {
     return result;
   }
 
+  async findEnrolledStudents(instructorId: string) {
+    const users = await this.userRepository.findEnrolledStudents(instructorId);
+    return users.map(user => {
+      const { password, ...result } = user;
+      return result;
+    });
+  }
+
   async findAllUsers() {
     const users = await this.userRepository.findAll();
     return users.map(user => {
@@ -75,3 +83,4 @@ export class AuthService {
     });
   }
 }
+

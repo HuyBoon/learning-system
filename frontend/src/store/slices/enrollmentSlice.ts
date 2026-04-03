@@ -15,7 +15,9 @@ interface EnrollmentState {
   enrollmentStatus: Record<string, { enrolled: boolean; status: string | null }>;
   loading: boolean;
   error: string | null;
+  isAllEnrollmentsFetched: boolean;
 }
+
 
 const initialState: EnrollmentState = {
   myEnrollments: [],
@@ -23,7 +25,9 @@ const initialState: EnrollmentState = {
   enrollmentStatus: {},
   loading: false,
   error: null,
+  isAllEnrollmentsFetched: false,
 };
+
 
 export const enrollInCourse = createAsyncThunk(
   'enrollment/enroll',
@@ -73,6 +77,19 @@ export const fetchAllEnrollments = createAsyncThunk(
   }
 );
 
+export const fetchEnrolledEnrollments = createAsyncThunk(
+  'enrollment/fetchEnrolled',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/enrollments/enrolled-students');
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch enrollments');
+    }
+  }
+);
+
+
 const enrollmentSlice = createSlice({
   name: 'enrollment',
   initialState,
@@ -114,11 +131,29 @@ const enrollmentSlice = createSlice({
       .addCase(fetchAllEnrollments.fulfilled, (state, action: PayloadAction<Enrollment[]>) => {
         state.loading = false;
         state.allEnrollments = action.payload;
+        state.isAllEnrollmentsFetched = true;
       })
       .addCase(fetchAllEnrollments.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
+        state.isAllEnrollmentsFetched = true;
+      })
+      // Fetch Enrolled (Instructor)
+      .addCase(fetchEnrolledEnrollments.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchEnrolledEnrollments.fulfilled, (state, action: PayloadAction<Enrollment[]>) => {
+        state.loading = false;
+        state.allEnrollments = action.payload;
+        state.isAllEnrollmentsFetched = true;
+      })
+      .addCase(fetchEnrolledEnrollments.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.isAllEnrollmentsFetched = true;
       });
+
   },
 });
 

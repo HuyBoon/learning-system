@@ -29,6 +29,26 @@ export class UserRepository {
     return this.prisma.user.delete({ where: { id } });
   }
 
+  async findEnrolledStudents(instructorId: string): Promise<any[]> {
+    return this.prisma.user.findMany({
+      where: {
+        enrollments: {
+          some: {
+            course: {
+              instructorId: instructorId
+            }
+          }
+        }
+      },
+      include: {
+        _count: {
+          select: { enrollments: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
   async findAll(): Promise<any[]> {
     return this.prisma.user.findMany({
       include: {
@@ -40,3 +60,4 @@ export class UserRepository {
     });
   }
 }
+

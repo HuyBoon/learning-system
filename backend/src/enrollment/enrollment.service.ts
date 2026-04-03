@@ -50,6 +50,10 @@ export class EnrollmentService {
     return !!enrollment;
   }
 
+  async findEnrolledEnrollments(instructorId: string) {
+    return this.enrollmentRepository.findEnrolledEnrollments(instructorId);
+  }
+
   async findAll() {
     return this.enrollmentRepository.findMany({}, {
       user: {
@@ -69,3 +73,4 @@ export class EnrollmentService {
     });
   }
 }
+
