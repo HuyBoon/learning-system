@@ -1,5 +1,6 @@
-import { IsString, IsNotEmpty, IsOptional, IsUrl, IsNumber, IsUUID, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsUrl, IsNumber, IsUUID, Min, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
+import { LessonType } from '@prisma/client';
 
 export class CreateLessonDto {
   @IsString()
@@ -7,12 +8,16 @@ export class CreateLessonDto {
   title: string;
 
   @IsUrl()
-  @IsNotEmpty()
-  videoUrl: string;
+  @IsOptional()
+  videoUrl?: string;
 
   @IsString()
   @IsOptional()
   content?: string;
+
+  @IsEnum(LessonType)
+  @IsOptional()
+  type?: LessonType;
 
   @IsUUID()
   @IsNotEmpty()
@@ -37,6 +42,10 @@ export class UpdateLessonDto {
   @IsString()
   @IsOptional()
   content?: string;
+
+  @IsEnum(LessonType)
+  @IsOptional()
+  type?: LessonType;
 
   @IsNumber()
   @Min(0)

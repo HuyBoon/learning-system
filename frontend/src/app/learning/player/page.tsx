@@ -16,9 +16,16 @@ import {
   Lock,
   Loader2,
   ChevronLeft,
-  Clock
+  Clock,
+  FileImage,
+  FileCode,
+  FileJson,
+  File,
+  ExternalLink,
+  Paperclip as PaperclipIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LessonType } from '@/types/course';
 
 function PlayerContent() {
   const searchParams = useSearchParams();
@@ -41,6 +48,16 @@ function PlayerContent() {
   }, [selectedCourse, activeLessonId]);
 
   const activeLesson = selectedCourse?.lessons?.find(l => l.id === activeLessonId);
+
+  const getFileIcon = (type: string) => {
+    switch (type) {
+      case 'PDF': return <FileText className="h-5 w-5 text-red-500" />;
+      case 'IMAGE': return <FileImage className="h-5 w-5 text-blue-500" />;
+      case 'CODE': return <FileCode className="h-5 w-5 text-green-500" />;
+      case 'ZIP': return <FileJson className="h-5 w-5 text-amber-500" />;
+      default: return <File className="h-5 w-5 text-slate-400" />;
+    }
+  };
 
   if (loading && !selectedCourse) {
     return (
@@ -71,80 +88,133 @@ function PlayerContent() {
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden pt-20">
         
         {/* Main Player Area */}
-        <div className="flex-1 flex flex-col bg-black overflow-y-auto">
-          <div className="relative aspect-video w-full bg-slate-900 group">
-            {activeLesson ? (
-              <div className="absolute inset-0 flex items-center justify-center">
-                 {/* Mock video player */}
-                 <div className="w-full h-full bg-gradient-to-br from-indigo-900/40 to-slate-900/60 flex flex-col items-center justify-center p-10 text-center">
-                    <div className="h-24 w-24 bg-indigo-600 rounded-full flex items-center justify-center shadow-2xl shadow-indigo-500/50 mb-8 cursor-pointer hover:scale-110 transition-transform">
-                      <Play className="h-10 w-10 text-white fill-white ml-1" />
-                    </div>
-                    <h3 className="text-2xl font-black text-white mb-2">{activeLesson.title}</h3>
-                    <p className="text-slate-400 font-medium">Session {selectedCourse.lessons?.indexOf(activeLesson)! + 1} of {selectedCourse.lessons?.length}</p>
-                 </div>
-              </div>
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-slate-500">
-                <Lock className="h-12 w-12 mb-4 opacity-20" />
-                <span className="font-bold">Select a lesson to begin</span>
-              </div>
-            )}
-            
-            {/* Player Controls Mockup */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="h-1.5 w-full bg-white/20 rounded-full mb-6">
-                 <div className="h-full w-[45%] bg-indigo-500 rounded-full relative">
-                   <div className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-4 bg-white rounded-full shadow-lg"></div>
-                 </div>
-              </div>
-              <div className="flex items-center justify-between text-white">
-                <div className="flex items-center space-x-6">
-                   <Play className="h-6 w-6 fill-white" />
-                   <div className="text-sm font-bold tracking-widest">12:45 / 24:00</div>
+        <div className="flex-1 flex flex-col bg-black overflow-y-auto custom-scrollbar">
+          {(activeLesson?.type === LessonType.VIDEO || activeLesson?.type === LessonType.MIXED) && (
+            <div className="relative aspect-video w-full bg-slate-900 group flex-shrink-0">
+              {activeLesson ? (
+                <div className="absolute inset-0 flex items-center justify-center">
+                   {/* Mock video player */}
+                   <div className="w-full h-full bg-gradient-to-br from-indigo-900/40 to-slate-900/60 flex flex-col items-center justify-center p-10 text-center">
+                      <div className="h-24 w-24 bg-indigo-600 rounded-full flex items-center justify-center shadow-2xl shadow-indigo-500/50 mb-8 cursor-pointer hover:scale-110 transition-transform">
+                        <Play className="h-10 w-10 text-white fill-white ml-1" />
+                      </div>
+                      <h3 className="text-2xl font-black text-white mb-2">{activeLesson.title}</h3>
+                      <p className="text-slate-400 font-medium">Session {selectedCourse.lessons?.indexOf(activeLesson)! + 1} of {selectedCourse.lessons?.length}</p>
+                   </div>
                 </div>
-                <div className="flex items-center space-x-6">
-                   <Settings className="h-5 w-5" />
-                   <Fullscreen className="h-5 w-5" />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-slate-500">
+                  <Lock className="h-12 w-12 mb-4 opacity-20" />
+                  <span className="font-bold">Select a lesson to begin</span>
+                </div>
+              )}
+              
+              {/* Player Controls Mockup */}
+              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="h-1.5 w-full bg-white/20 rounded-full mb-6">
+                   <div className="h-full w-[45%] bg-indigo-500 rounded-full relative">
+                     <div className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-4 bg-white rounded-full shadow-lg"></div>
+                   </div>
+                </div>
+                <div className="flex items-center justify-between text-white">
+                  <div className="flex items-center space-x-6">
+                     <Play className="h-6 w-6 fill-white" />
+                     <div className="text-sm font-bold tracking-widest uppercase">12:45 / 24:00</div>
+                  </div>
+                  <div className="flex items-center space-x-6">
+                     <Settings className="h-5 w-5" />
+                     <Fullscreen className="h-5 w-5" />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
-          <div className="p-10 text-white space-y-8">
+          <div className="p-10 text-white space-y-12">
             <div>
               <div className="flex items-center space-x-2 text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
                 <span>Currently Viewing</span>
               </div>
-              <h1 className="text-3xl font-black tracking-tight mb-4">{activeLesson?.title}</h1>
-              <div className="flex flex-wrap items-center gap-6">
-                <div className="flex items-center space-x-2 text-slate-400 font-bold text-sm">
-                   <Clock className="h-4 w-4" />
+              <h1 className="text-4xl font-black tracking-tight mb-6">{activeLesson?.title}</h1>
+              <div className="flex flex-wrap items-center gap-8">
+                <div className="flex items-center space-x-2.5 text-slate-400 font-bold text-sm">
+                   <Clock className="h-5 w-5" />
                    <span>Duration: 18 mins</span>
                 </div>
-                <div className="flex items-center space-x-2 text-slate-400 font-bold text-sm">
-                   <FileText className="h-4 w-4" />
-                   <span>1 Resource attached</span>
+                {activeLesson?.materials && activeLesson.materials.length > 0 && (
+                  <div className="flex items-center space-x-2.5 text-slate-400 font-bold text-sm">
+                    <PaperclipIcon className="h-5 w-5" />
+                    <span>{activeLesson.materials.length} Resources attached</span>
+                  </div>
+                )}
+                <div className="flex items-center space-x-2.5 text-indigo-400 font-bold text-sm bg-indigo-500/10 px-3 py-1 rounded-lg">
+                  <span className="uppercase tracking-widest text-[10px]">{activeLesson?.type} CONTENT</span>
                 </div>
               </div>
             </div>
 
             <div className="h-[1px] bg-white/10"></div>
 
-            <div className="prose prose-invert max-w-none">
-              <p className="text-slate-400 leading-relaxed text-lg">
-                {activeLesson?.content || "No detailed description available for this lesson. Please follow along with the video instruction for full details on this module's objectives."}
-              </p>
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-12">
+              <div className="xl:col-span-2">
+                <div className="prose prose-invert prose-slate max-w-none prose-h2:text-white prose-h1:text-white prose-strong:text-white prose-a:text-indigo-400">
+                  {activeLesson?.content ? (
+                    <div 
+                      className="text-slate-300 leading-relaxed text-lg"
+                      dangerouslySetInnerHTML={{ __html: activeLesson.content }} 
+                    />
+                  ) : (
+                    <p className="text-slate-500 italic">
+                      No detailed description available for this lesson. Please follow along with the video instruction for full details on this module&apos;s objectives.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <h3 className="text-lg font-black text-white uppercase tracking-wider flex items-center space-x-2">
+                  <Download className="h-5 w-5 text-indigo-500" />
+                  <span>Resources</span>
+                </h3>
+                {activeLesson?.materials && activeLesson.materials.length > 0 ? (
+                  <div className="space-y-3">
+                    {activeLesson.materials.map((m) => (
+                      <a
+                        key={m.id}
+                        href={m.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between p-4 bg-slate-900/50 border border-white/5 rounded-[1.5rem] hover:bg-slate-800 hover:border-indigo-500/30 transition-all group"
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div className="p-2.5 bg-slate-800 rounded-xl">
+                            {getFileIcon(m.fileType)}
+                          </div>
+                          <div>
+                            <p className="font-bold text-white text-sm line-clamp-1">{m.title}</p>
+                            <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{(m.size / 1024).toFixed(1)} KB</p>
+                          </div>
+                        </div>
+                        <ExternalLink className="h-4 w-4 text-slate-600 group-hover:text-indigo-500 transition-colors" />
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-6 bg-slate-900/30 border border-dashed border-white/10 rounded-2xl text-center">
+                    <p className="text-sm text-slate-500 font-medium">No downloadable materials available for this lesson.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Sidebar: Curriculum */}
-        <div className="w-full lg:w-[400px] bg-slate-900 border-l border-white/10 flex flex-col">
+        <div className="w-full lg:w-[400px] bg-slate-900 border-l border-white/10 flex flex-col flex-shrink-0">
           <div className="p-8 border-b border-white/10">
              <h2 className="text-xl font-black text-white tracking-tight mb-1">Course Content</h2>
              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">3 / {selectedCourse.lessons?.length || 0} COMPLETED</span>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Curriculum Progress</span>
                 <span className="text-xs font-black text-indigo-400">24%</span>
              </div>
              <div className="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
@@ -152,28 +222,34 @@ function PlayerContent() {
              </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-2">
+          <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
             {(selectedCourse.lessons || []).map((lesson, idx) => {
               const isActive = activeLessonId === lesson.id;
               return (
                 <button
                   key={lesson.id}
                   onClick={() => setActiveLessonId(lesson.id)}
-                  className={`w-full flex items-start space-x-4 p-4 rounded-2xl transition-all text-left ${
+                  className={`w-full flex items-start space-x-4 p-4 rounded-[1.5rem] transition-all text-left group ${
                     isActive 
-                    ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-900/20' 
+                    ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-900/40 relative z-10' 
                     : 'text-slate-400 hover:bg-white/5 hover:text-white'
                   }`}
                 >
-                  <div className={`mt-0.5 flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center border-2 ${
-                    isActive ? 'border-white/40 bg-white/20' : 'border-slate-700 bg-slate-800'
+                  <div className={`mt-0.5 flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center border-2 transition-colors ${
+                    isActive ? 'border-white/40 bg-white/20' : 'border-slate-700 bg-slate-800 group-hover:border-slate-500'
                   }`}>
                     {idx < 3 ? <CheckCircle className="h-3 w-3 fill-current" /> : <span className="text-[10px] font-black">{idx + 1}</span>}
                   </div>
                   <div className="flex-1">
                     <div className="font-bold text-sm line-clamp-2 leading-tight mb-1">{lesson.title}</div>
-                    <div className={`text-[10px] font-black uppercase tracking-widest ${isActive ? 'text-indigo-200' : 'text-slate-600'}`}>
-                      12:15 mins
+                    <div className="flex items-center space-x-2">
+                      <span className={`text-[10px] font-black uppercase tracking-widest ${isActive ? 'text-indigo-200' : 'text-slate-600'}`}>
+                        {lesson.type}
+                      </span>
+                      <span className="h-1 w-1 bg-slate-700 rounded-full"></span>
+                      <span className={`text-[10px] font-black uppercase tracking-widest ${isActive ? 'text-indigo-200' : 'text-slate-600'}`}>
+                        12:15 mins
+                      </span>
                     </div>
                   </div>
                 </button>
@@ -206,3 +282,4 @@ export default function LearningPlayerPage() {
     </Suspense>
   );
 }
+

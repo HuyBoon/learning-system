@@ -6,6 +6,7 @@ datasource db {
   provider = "postgresql"
 }
 
+
 enum Role {
   ADMIN
   INSTRUCTOR
@@ -15,6 +16,20 @@ enum Role {
 enum EnrollmentStatus {
   PENDING
   COMPLETED
+}
+
+enum LessonType {
+  VIDEO
+  ARTICLE
+  MIXED
+}
+
+enum FileType {
+  PDF
+  ZIP
+  IMAGE
+  CODE
+  OTHER
 }
 
 model User {
@@ -60,14 +75,30 @@ model Course {
 model Lesson {
   id        String   @id @default(uuid())
   title     String
-  videoUrl  String
+  videoUrl  String?
   content   String?  @db.Text
+  type      LessonType @default(VIDEO)
   courseId  String
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  materials Material[]
+}
+
+model Material {
+  id        String   @id @default(uuid())
+  title     String
+  fileUrl   String
+  fileType  FileType
+  size      Int
+  publicId  String
+  lessonId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 }
 
 model Enrollment {

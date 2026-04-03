@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Put, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto, UpdateLessonDto } from './dto/lesson.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -15,6 +16,18 @@ export class LessonController {
   @Roles(Role.INSTRUCTOR, Role.ADMIN)
   create(@Body() createLessonDto: CreateLessonDto, @Request() req: any) {
     return this.lessonService.create(createLessonDto, req.user.userId, req.user.role);
+  }
+
+  @Post(':id/upload-image')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.INSTRUCTOR, Role.ADMIN)
+  @UseInterceptors(FileInterceptor('image'))
+  uploadImage(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req: any,
+  ) {
+    return this.lessonService.uploadImage(id, file, req.user.userId, req.user.role);
   }
 
   @Get('course/:courseId')

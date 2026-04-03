@@ -9,13 +9,40 @@ export interface Category {
   };
 }
 
+export enum LessonType {
+  VIDEO = 'VIDEO',
+  ARTICLE = 'ARTICLE',
+  MIXED = 'MIXED'
+}
+
+export enum FileType {
+  PDF = 'PDF',
+  ZIP = 'ZIP',
+  IMAGE = 'IMAGE',
+  CODE = 'CODE',
+  OTHER = 'OTHER'
+}
+
+export interface Material {
+  id: string;
+  title: string;
+  fileUrl: string;
+  fileType: FileType;
+  size: number;
+  publicId: string;
+  lessonId: string;
+  createdAt: string;
+}
+
 export interface Lesson {
   id: string;
   title: string;
-  videoUrl: string;
+  videoUrl?: string;
   content?: string;
+  type: LessonType;
   courseId: string;
   order: number;
+  materials?: Material[];
 }
 
 export interface Course {

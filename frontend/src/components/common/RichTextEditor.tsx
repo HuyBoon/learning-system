@@ -19,37 +19,44 @@ import {
 } from 'lucide-react';
 import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { uploadToCloudinary } from '@/lib/cloudinary';
+import { useAppDispatch } from '@/store/hooks';
+import { uploadLessonImage } from '@/store/slices/courseSlice';
 
 interface RichTextEditorProps {
   content: string;
   onChange: (content: string) => void;
   placeholder?: string;
+  lessonId?: string;
 }
 
-const MenuBar = ({ editor }: { editor: any }) => {
+const MenuBar = ({ editor, lessonId }: { editor: any; lessonId?: string }) => {
   if (!editor) return null;
 
+  const dispatch = useAppDispatch();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const addImage = () => {
+    if (!lessonId) {
+      toast.error('Save the lesson first before uploading images');
+      return;
+    }
     fileInputRef.current?.click();
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !lessonId) return;
 
     setIsUploading(true);
-    const toastId = toast.loading('Uploading image to Cloudinary...');
+    const toastId = toast.loading('Uploading image securely...');
 
     try {
-      const data = await uploadToCloudinary(file, 'editor-content');
-      editor.chain().focus().setImage({ src: data.secure_url }).run();
+      const result = await dispatch(uploadLessonImage({ lessonId, file })).unwrap();
+      editor.chain().focus().setImage({ src: result.url }).run();
       toast.success('Image inserted successfully', { id: toastId });
     } catch (error: any) {
-      toast.error(error.message || 'Failed to upload image', { id: toastId });
+      toast.error(error || 'Failed to upload image', { id: toastId });
     } finally {
       setIsUploading(false);
       if (e.target) e.target.value = '';
@@ -118,12 +125,12 @@ const MenuBar = ({ editor }: { editor: any }) => {
   );
 };
 
-export default function RichTextEditor({ content, onChange, placeholder }: RichTextEditorProps) {
+export default function RichTextEditor({ content, onChange, placeholder, lessonId }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
       Image.configure({
-        allowBase64: true,
+        allowBase64: false,
       }),
     ],
     content,
@@ -140,8 +147,9 @@ export default function RichTextEditor({ content, onChange, placeholder }: RichT
 
   return (
     <div className="w-full bg-white border border-slate-200 rounded-[1.5rem] overflow-hidden focus-within:ring-4 focus-within:ring-indigo-100 focus-within:border-indigo-600 transition-all shadow-sm">
-      <MenuBar editor={editor} />
+      <MenuBar editor={editor} lessonId={lessonId} />
       <EditorContent editor={editor} />
     </div>
   );
 }
+

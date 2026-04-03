@@ -146,6 +146,65 @@ export const reorderLessons = createAsyncThunk(
   }
 );
 
+// Material Thunks
+export const fetchMaterials = createAsyncThunk(
+  'courses/fetchMaterials',
+  async (lessonId: string, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/materials/lesson/${lessonId}`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch materials');
+    }
+  }
+);
+
+export const uploadMaterial = createAsyncThunk(
+  'courses/uploadMaterial',
+  async ({ lessonId, file, title }: { lessonId: string; file: File; title: string }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('lessonId', lessonId);
+      formData.append('title', title);
+      const response = await api.post('/materials/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to upload material');
+    }
+  }
+);
+
+export const deleteMaterial = createAsyncThunk(
+  'courses/deleteMaterial',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await api.delete(`/materials/${id}`);
+      return id;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to delete material');
+    }
+  }
+);
+
+export const uploadLessonImage = createAsyncThunk(
+  'courses/uploadLessonImage',
+  async ({ lessonId, file }: { lessonId: string; file: File }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const response = await api.post(`/lessons/${lessonId}/upload-image`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to upload image');
+    }
+  }
+);
+
 const courseSlice = createSlice({
   name: 'courses',
   initialState,
@@ -210,6 +269,25 @@ const courseSlice = createSlice({
       .addCase(deleteLesson.fulfilled, (state, action: PayloadAction<string>) => {
         if (state.selectedCourse && state.selectedCourse.lessons) {
              state.selectedCourse.lessons = state.selectedCourse.lessons.filter(l => l.id !== action.payload);
+        }
+      })
+      // Materials
+      .addCase(uploadMaterial.fulfilled, (state, action: PayloadAction<any>) => {
+
+        if (state.selectedCourse && state.selectedCourse.lessons) {
+          const lesson = state.selectedCourse.lessons.find(l => l.id === action.payload.lessonId);
+          if (lesson) {
+            lesson.materials = [...(lesson.materials || []), action.payload];
+          }
+        }
+      })
+      .addCase(deleteMaterial.fulfilled, (state, action: PayloadAction<string>) => {
+        if (state.selectedCourse && state.selectedCourse.lessons) {
+          state.selectedCourse.lessons.forEach(l => {
+            if (l.materials) {
+              l.materials = l.materials.filter(m => m.id !== action.payload);
+            }
+          });
         }
       });
   },
